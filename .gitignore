@@ -1,0 +1,17 @@
+# general
+tmp/
+!**/.gitkeep
+.DS_Store
+.env
+.env.*
+!.env.template
+
+# binaries
+cognito-backup-restore
+cognito-backup-restore.exe
+cbr
+cbr.exe
+__debug*
+
+# data
+/backup.json

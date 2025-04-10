@@ -7,6 +7,7 @@ tmp/
 !.env.template
 
 # binaries
+dist/
 cognito-backup-restore
 cognito-backup-restore.exe
 cbr

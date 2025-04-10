@@ -49,7 +49,7 @@ func BackupUsers(poolId, outPath string) error {
 	}
 
 	if err := os.WriteFile(outPath, data, 0644); err != nil {
-		return fmt.Errorf("coud not write file: %w", err)
+		return fmt.Errorf("could not write file: %w", err)
 	}
 
 	return nil

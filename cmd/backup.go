@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"github.com/cruxstack/cognito-backup-restore-go/internal/cognito"

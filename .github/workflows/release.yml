@@ -41,4 +41,4 @@ jobs:
             dist/cbr_${{ steps.tag_version.outputs.new_tag }}_darwin_arm64
             dist/cbr_${{ steps.tag_version.outputs.new_tag }}_windows_amd64.exe
           artifactErrorsFailBuild: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}

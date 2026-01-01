@@ -21,5 +21,6 @@ var backupCmd = &cobra.Command{
 func init() {
 	backupCmd.Flags().StringVarP(&backupPoolId, "pool-id", "p", "", "pool id")
 	backupCmd.Flags().StringVarP(&backupOutPath, "out", "o", "backup.json", "output path")
+	backupCmd.MarkFlagRequired("pool-id")
 	rootCmd.AddCommand(backupCmd)
 }

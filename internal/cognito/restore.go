@@ -15,7 +15,7 @@ func RestoreUsers(poolId, inPath string) error {
 		return fmt.Errorf("userpool id is required")
 	}
 	if inPath == "" {
-		return fmt.Errorf("output path is required")
+		return fmt.Errorf("input path is required")
 	}
 
 	client, err := CreateClient()
@@ -33,6 +33,7 @@ func RestoreUsers(poolId, inPath string) error {
 		return fmt.Errorf("could not unmarshal users: %w", err)
 	}
 
+	var failedUsers []string
 	for _, u := range users {
 		params := &cognitoidentityprovider.AdminCreateUserInput{
 			UserPoolId:     &poolId,
@@ -42,7 +43,12 @@ func RestoreUsers(poolId, inPath string) error {
 		_, err := client.AdminCreateUser(context.Background(), params)
 		if err != nil {
 			fmt.Printf("could not create user %s: %v\n", *u.Username, err)
+			failedUsers = append(failedUsers, *u.Username)
 		}
+	}
+
+	if len(failedUsers) > 0 {
+		return fmt.Errorf("failed to restore %d user(s): %v", len(failedUsers), failedUsers)
 	}
 
 	return nil

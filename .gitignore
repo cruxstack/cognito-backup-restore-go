@@ -8,6 +8,7 @@ tmp/
 
 # binaries
 dist/
+cognito-backup-restore-go
 cognito-backup-restore
 cognito-backup-restore.exe
 cbr

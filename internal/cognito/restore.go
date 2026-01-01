@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
@@ -12,7 +13,7 @@ import (
 
 func RestoreUsers(poolId, inPath string) error {
 	if poolId == "" {
-		return fmt.Errorf("userpool id is required")
+		return fmt.Errorf("pool id is required")
 	}
 	if inPath == "" {
 		return fmt.Errorf("input path is required")
@@ -20,18 +21,20 @@ func RestoreUsers(poolId, inPath string) error {
 
 	client, err := CreateClient()
 	if err != nil {
-		return fmt.Errorf("failed to create aws client for cognito idp: %w", err)
+		return fmt.Errorf("failed to create cognito client: %w", err)
 	}
 
 	data, err := os.ReadFile(inPath)
 	if err != nil {
-		return fmt.Errorf("could not read file: %w", err)
+		return fmt.Errorf("failed to read file: %w", err)
 	}
 
 	var users []types.UserType
 	if err := json.Unmarshal(data, &users); err != nil {
-		return fmt.Errorf("could not unmarshal users: %w", err)
+		return fmt.Errorf("failed to unmarshal users: %w", err)
 	}
+
+	slog.Info("starting restore", "pool_id", poolId, "user_count", len(users))
 
 	var failedUsers []string
 	for _, u := range users {
@@ -42,7 +45,7 @@ func RestoreUsers(poolId, inPath string) error {
 		}
 		_, err := client.AdminCreateUser(context.Background(), params)
 		if err != nil {
-			fmt.Printf("could not create user %s: %v\n", *u.Username, err)
+			slog.Warn("failed to create user", "username", *u.Username, "error", err)
 			failedUsers = append(failedUsers, *u.Username)
 		}
 	}
@@ -50,6 +53,8 @@ func RestoreUsers(poolId, inPath string) error {
 	if len(failedUsers) > 0 {
 		return fmt.Errorf("failed to restore %d user(s): %v", len(failedUsers), failedUsers)
 	}
+
+	slog.Info("restore complete", "pool_id", poolId, "user_count", len(users))
 
 	return nil
 }

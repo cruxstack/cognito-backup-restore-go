@@ -3,6 +3,7 @@ package cognito
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
@@ -15,11 +16,13 @@ var maxResults int32 = 10
 func ListUserpools() ([]UserPoolDescription, error) {
 	client, err := CreateClient()
 	if err != nil {
-		return nil, fmt.Errorf("failed to create aws client for cognito idp: %w", err)
+		return nil, fmt.Errorf("failed to create cognito client: %w", err)
 	}
 
 	var token *string
 	var pools []UserPoolDescription
+
+	slog.Info("listing user pools")
 
 	for {
 		params := &cognitoidentityprovider.ListUserPoolsInput{
@@ -28,7 +31,7 @@ func ListUserpools() ([]UserPoolDescription, error) {
 		}
 		results, err := client.ListUserPools(context.Background(), params)
 		if err != nil {
-			return nil, fmt.Errorf("could not list userpools: %w", err)
+			return nil, fmt.Errorf("failed to list user pools: %w", err)
 		}
 
 		pools = append(pools, results.UserPools...)
@@ -38,6 +41,8 @@ func ListUserpools() ([]UserPoolDescription, error) {
 		}
 		token = results.NextToken
 	}
+
+	slog.Info("list complete", "pool_count", len(pools))
 
 	return pools, nil
 }

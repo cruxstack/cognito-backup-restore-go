@@ -11,7 +11,7 @@ import (
 func CreateClient() (*cognitoidentityprovider.Client, error) {
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("could not load aws config: %w", err)
+		return nil, fmt.Errorf("failed to load aws config: %w", err)
 	}
 
 	client := cognitoidentityprovider.NewFromConfig(cfg)

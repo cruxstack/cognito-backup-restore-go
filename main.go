@@ -1,7 +1,16 @@
 package main
 
-import "github.com/cruxstack/cognito-backup-restore-go/cmd"
+import (
+	"log/slog"
+	"os"
+
+	"github.com/cruxstack/cognito-backup-restore-go/cmd"
+)
 
 func main() {
-	cmd.Execute()
+	app := cmd.NewApp()
+	if err := app.Run(os.Args); err != nil {
+		slog.Error("command failed", "error", err)
+		os.Exit(1)
+	}
 }

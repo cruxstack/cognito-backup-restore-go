@@ -1,20 +1,17 @@
 package cmd
 
 import (
-	"log/slog"
-	"os"
-
-	"github.com/spf13/cobra"
+	"github.com/urfave/cli/v2"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "cbr",
-	Short: "cli tool for backing up and restoring aws cognito user",
-}
-
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		slog.Error("command failed", "error", err)
-		os.Exit(1)
+func NewApp() *cli.App {
+	return &cli.App{
+		Name:  "cbr",
+		Usage: "cli tool for backing up and restoring aws cognito users",
+		Commands: []*cli.Command{
+			newBackupCmd(),
+			newRestoreCmd(),
+			newListCmd(),
+		},
 	}
 }

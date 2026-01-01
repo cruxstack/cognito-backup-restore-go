@@ -2,25 +2,29 @@ package cmd
 
 import (
 	"github.com/cruxstack/cognito-backup-restore-go/internal/cognito"
-	"github.com/spf13/cobra"
+	"github.com/urfave/cli/v2"
 )
 
-var (
-	backupPoolId  string
-	backupOutPath string
-)
-
-var backupCmd = &cobra.Command{
-	Use:   "backup",
-	Short: "backup user from a cognito pool",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return cognito.BackupUsers(backupPoolId, backupOutPath)
-	},
-}
-
-func init() {
-	backupCmd.Flags().StringVarP(&backupPoolId, "pool-id", "p", "", "pool id")
-	backupCmd.Flags().StringVarP(&backupOutPath, "out", "o", "backup.json", "output path")
-	backupCmd.MarkFlagRequired("pool-id")
-	rootCmd.AddCommand(backupCmd)
+func newBackupCmd() *cli.Command {
+	return &cli.Command{
+		Name:  "backup",
+		Usage: "backup users from a cognito pool",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "pool-id",
+				Aliases:  []string{"p"},
+				Usage:    "pool id",
+				Required: true,
+			},
+			&cli.StringFlag{
+				Name:    "out",
+				Aliases: []string{"o"},
+				Usage:   "output path",
+				Value:   "backup.json",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			return cognito.BackupUsers(c.String("pool-id"), c.String("out"))
+		},
+	}
 }

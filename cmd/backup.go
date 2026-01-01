@@ -22,9 +22,13 @@ func newBackupCmd() *cli.Command {
 				Usage:   "output path",
 				Value:   "backup.json",
 			},
+			&cli.StringFlag{
+				Name:  "shard",
+				Usage: "deterministic shard index/total (e.g., 1/3 for first of 3 shards)",
+			},
 		},
 		Action: func(c *cli.Context) error {
-			return cognito.BackupUsers(c.String("pool-id"), c.String("out"))
+			return cognito.BackupUsers(c.String("pool-id"), c.String("out"), c.String("shard"))
 		},
 	}
 }

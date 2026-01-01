@@ -44,10 +44,28 @@ cbr list
 cbr backup --pool-id <POOL-ID> --out <FILE-PATH>
 ```
 
-| Flag        | Description                      | Default       |
-| ----------- | -------------------------------- | ------------- |
-| `--pool-id` | The Cognito user pool ID         | **required**  |
-| `--out`     | Output file path for the backup  | `backup.json` |
+| Flag        | Description                                              | Default       |
+| ----------- | -------------------------------------------------------- | ------------- |
+| `--pool-id` | The Cognito user pool ID                                 | **required**  |
+| `--out`     | Output file path for the backup                          | `backup.json` |
+| `--shard`   | Deterministic shard index/total (e.g., `1/3`, `2/3`)     | *(optional)*  |
+
+**Sharded backups**
+
+For large user pools, you can run backups in parallel across multiple CI runners
+using the `--shard` flag.
+
+```bash
+# Run 3 parallel backup jobs
+cbr backup --pool-id us-east-1_xxx --shard 1/3 --out backup.json  # outputs backup-1.json
+cbr backup --pool-id us-east-1_xxx --shard 2/3 --out backup.json  # outputs backup-2.json
+cbr backup --pool-id us-east-1_xxx --shard 3/3 --out backup.json  # outputs backup-3.json
+```
+
+Sharding uses the user's `sub` attribute (UUID) prefix to deterministically
+partition users. Each shard only fetches its portion of users from AWS, enabling
+true parallel execution without coordination between runners. The output
+filename is automatically suffixed with the shard index.
 
 **Restore users**
 

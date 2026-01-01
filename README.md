@@ -1,46 +1,105 @@
-# cognito-backup-restore-go
+# Cognito Backup Restore
 
-A CLI tool for managing AWS Cognito user pools and user data. It allows you to
-list Cognito user pools, back up users from a specific pool, and restore users
-to a pool from a backup file.
+## What
 
-## Prerequisites
+A CLI tool for backing up and restoring AWS Cognito user pool data.
 
-- [Go 1.24+](https://go.dev/dl/) (or later) installed
-- Valid AWS credentials configured
-- Proper IAM permissions to list user pools, list pool users, and create users
-  in Cognito
+## Why
 
-## Building
+AWS Cognito doesn't provide built-in backup/restore functionality. This tool
+lets you:
 
-1. Navigate to the project root.
-2. Run:
-   ```bash
-   go build -o cbr .
-   ```
-   This compiles the project and produces a `cbr` (or `cbr.exe` on Windows) binary.
+- **Back up user data** from any Cognito user pool to a JSON file
+- **Restore users** to a pool from a backup file
+- **List user pools** in your AWS account for discovery
 
 ## Usage
 
-Once you have the binary, you can run the following commands:
+### Installation
 
-- **List user pools**
-  ```bash
-  ./cbr list
-  ```
-  Lists up to 10 user pools at a time (it will iterate through all user pools until all are shown).
+Download a pre-built binary from the
+[releases page](https://github.com/cruxstack/cognito-backup-restore-go/releases),
+or build from source:
 
-- **Back up users from a user pool**
-  ```bash
-  ./cbr backup --pool-id <POOL-ID> --out <FILE-PATH>
-  ```
-  - `--pool-id`: The user pool ID. Required.
-  - `--out`: The path to the file where you want the backup written. Default: `backup.json`.
+```bash
+go build -o cbr .
+```
 
-- **Restore users to a user pool**
-  ```bash
-  ./cbr restore --pool-id <POOL-ID> --in <FILE-PATH>
-  ```
-  - `--pool-id`: The user pool ID. Required.
-  - `--in`: Path to the backup file. Default: `backup.json`.
+### Prerequisites
 
+- Valid AWS credentials configured (via environment, shared credentials, or IAM role)
+- IAM permissions: `cognito-idp:ListUserPools`, `cognito-idp:ListUsers`, `cognito-idp:AdminCreateUser`
+
+### Commands
+
+**List user pools**
+
+```bash
+cbr list
+```
+
+**Back up users**
+
+```bash
+cbr backup --pool-id <POOL-ID> --out <FILE-PATH>
+```
+
+| Flag        | Description                      | Default       |
+| ----------- | -------------------------------- | ------------- |
+| `--pool-id` | The Cognito user pool ID         | **required**  |
+| `--out`     | Output file path for the backup  | `backup.json` |
+
+**Restore users**
+
+```bash
+cbr restore --pool-id <POOL-ID> --in <FILE-PATH>
+```
+
+| Flag        | Description                      | Default       |
+| ----------- | -------------------------------- | ------------- |
+| `--pool-id` | The Cognito user pool ID         | **required**  |
+| `--in`      | Input file path for the backup   | `backup.json` |
+
+---
+
+# Development
+
+## Project Structure
+
+```
+├── cmd/                  # CLI command definitions
+│   ├── backup.go
+│   ├── list.go
+│   ├── restore.go
+│   └── root.go
+├── internal/cognito/     # AWS Cognito client and operations
+│   ├── backup.go
+│   ├── client.go
+│   ├── list.go
+│   └── restore.go
+├── build/                # Build scripts
+└── main.go               # Entrypoint
+```
+
+## Building
+
+```bash
+# Local build
+go build -o cbr .
+
+# Cross-platform builds (for releases)
+./build/build.sh v1.0.0
+```
+
+## Testing
+
+```bash
+go test ./...
+```
+
+## Linting
+
+```bash
+go vet ./...
+gofmt -l .
+```
